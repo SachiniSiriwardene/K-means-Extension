@@ -3,6 +3,9 @@ package extension;
 import Kmeans.Clusterer;
 import org.wso2.siddhi.annotation.Example;
 import org.wso2.siddhi.annotation.Extension;
+import org.wso2.siddhi.annotation.Parameter;
+import org.wso2.siddhi.annotation.ReturnAttribute;
+import org.wso2.siddhi.annotation.util.DataType;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEvent;
 import org.wso2.siddhi.core.event.ComplexEventChunk;
@@ -26,11 +29,22 @@ import java.util.Map;
 @Extension(
         name = "cluster",
         namespace = "kmeans",
-        description = "TBD",
+        description = "Performs single dimension clustering on a given data set for a given indow implementation",
+        parameters = {
+                @Parameter(name = "data",
+                        description = "value to be clustered, no. of cluster centers, no. of iterations," +
+                                       "no. of events each for which the model is trained, continue training",
+                        type = {DataType.DOUBLE, DataType.INT, DataType.INT, DataType.INT, DataType.BOOL}),
+
+        },
+       /* returnAttributes = @ReturnAttribute(
+                description = "Returns cluster center to which data point belongs to, the index of the cluster center,"
+                               + "the difference between the value and the cluster center",
+                type = {DataType.DOUBLE, DataType.INT, DataType.DOUBLE}),*/
         examples = @Example(description = "TBD", syntax = "TBD")
 )
 public class ClusteringStreamProcessor extends StreamProcessor implements SchedulingProcessor {
-    private static Clusterer clusterer;
+    private static Clusterer clusterer = new Clusterer();
     private int clusters;
     private int iterations;
     private boolean continueTraining;
