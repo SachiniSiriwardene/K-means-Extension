@@ -4,7 +4,6 @@ import Kmeans.Clusterer;
 import org.wso2.siddhi.annotation.Example;
 import org.wso2.siddhi.annotation.Extension;
 import org.wso2.siddhi.annotation.Parameter;
-import org.wso2.siddhi.annotation.ReturnAttribute;
 import org.wso2.siddhi.annotation.util.DataType;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.event.ComplexEvent;
@@ -15,9 +14,7 @@ import org.wso2.siddhi.core.event.stream.populater.ComplexEventPopulater;
 import org.wso2.siddhi.core.executor.ConstantExpressionExecutor;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.Processor;
-import org.wso2.siddhi.core.query.processor.SchedulingProcessor;
 import org.wso2.siddhi.core.query.processor.stream.StreamProcessor;
-import org.wso2.siddhi.core.util.Scheduler;
 import org.wso2.siddhi.core.util.config.ConfigReader;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -34,7 +31,7 @@ import java.util.Map;
         parameters = {
                 @Parameter(name = "data",
                         description = "value to be clustered, no. of cluster centers, no. of iterations," +
-                                       "no. of events each for which the model is trained, continue training",
+                                "no. of events each for which the model is trained, continue training",
                         type = {DataType.DOUBLE, DataType.INT, DataType.INT, DataType.INT, DataType.BOOL}),
 
         },
@@ -44,7 +41,7 @@ import java.util.Map;
                 type = {DataType.DOUBLE, DataType.INT, DataType.DOUBLE}),*/
         examples = @Example(description = "TBD", syntax = "TBD")
 )
-public class ClusteringStreamProcessor extends StreamProcessor implements SchedulingProcessor {
+public class ClusteringStreamProcessor extends StreamProcessor {
     private static Clusterer clusterer = new Clusterer();
     private int clusters;
     private int iterations;
@@ -52,7 +49,6 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
     private int eventsToTrain;
     private int count;
     private ArrayList<Double> data = new ArrayList<>();
-    private Scheduler scheduler;
     private double value;
 
     @Override
@@ -72,7 +68,7 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
                     if (count % eventsToTrain == 0) {
                         clusterer.cluster(data);
                     }
-                }else {
+                } else {
                     if (count == eventsToTrain) {
                         clusterer.cluster(data);
                         clusterer.clearData();
@@ -84,12 +80,12 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
                     complexEventPopulater.populateComplexEvent(streamEvent, outputData);
                 }
             } else if (streamEvent.getType() == ComplexEvent.Type.RESET) {
-                if(count > eventsToTrain) {
+                if (count > eventsToTrain) {
                     data.clear();
                     continue;
                 }
             } else if (streamEvent.getType() == ComplexEvent.Type.EXPIRED) {
-                if(count > eventsToTrain) {
+                if (count > eventsToTrain) {
                     data.remove(0);
                     continue;
                 }
@@ -120,14 +116,13 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
         }
 
 
-
         Object clustersObject = attributeExpressionExecutors[1].execute(null);
         if (clustersObject instanceof Integer) {
             clusters = (Integer) clustersObject;
             clusterer.setNoOfClusters(clusters);
             ArrayList<Double>[] clusterGroup = new ArrayList[clusters];
             clusterer.setClusterGroup(clusterGroup);
-        }  else {
+        } else {
             throw new ExecutionPlanValidationException("Cluster centers should be of type int. But found "
                     + attributeExpressionExecutors[2].getReturnType());
         }
@@ -137,17 +132,16 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
         if (iterationsObject instanceof Integer) {
             iterations = (Integer) iterationsObject;
             clusterer.setMaxIter(iterations);
-        }  else {
+        } else {
             throw new ExecutionPlanValidationException("Iterations should be of type int. But found "
                     + attributeExpressionExecutors[2].getReturnType());
         }
 
 
-
         Object eventsToTrainObject = attributeExpressionExecutors[3].execute(null);
         if (eventsToTrainObject instanceof Integer) {
             eventsToTrain = (Integer) eventsToTrainObject;
-        }  else {
+        } else {
             throw new ExecutionPlanValidationException("Events to train should be of type int. But found "
                     + attributeExpressionExecutors[2].getReturnType());
         }
@@ -156,7 +150,7 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
         Object continueTrainObject = attributeExpressionExecutors[4].execute(null);
         if (continueTrainObject instanceof Boolean) {
             continueTraining = (Boolean) continueTrainObject;
-        }  else {
+        } else {
             throw new ExecutionPlanValidationException("Continue to train should be of type boolean. But found "
                     + attributeExpressionExecutors[2].getReturnType());
         }
@@ -189,14 +183,5 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
 
     }
 
-    @Override
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
-    @Override
-    public void setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
 
 }
