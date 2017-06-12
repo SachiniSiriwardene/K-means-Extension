@@ -69,11 +69,15 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
                     complexEventPopulater.populateComplexEvent(streamEvent, outputData);
                 }
             } else if (streamEvent.getType() == ComplexEvent.Type.RESET) {
-                data.clear();
-                continue;
+                if(count > eventsToTrain) {
+                    data.clear();
+                    continue;
+                }
             } else if (streamEvent.getType() == ComplexEvent.Type.EXPIRED) {
-                data.remove(0);
-                continue;
+                if(count > eventsToTrain) {
+                    data.remove(0);
+                    continue;
+                }
             }
         }
         nextProcessor.process(streamEventChunk);

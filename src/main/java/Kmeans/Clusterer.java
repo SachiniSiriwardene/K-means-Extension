@@ -12,16 +12,8 @@ public class Clusterer {
     private static ArrayList<Double> distinctValues = new ArrayList<>();
     private static int distinctCount = 0;
 
-    public static int getNoOfClusters() {
-        return noOfClusters;
-    }
-
     public static void setNoOfClusters(int noOfClusters) {
         Clusterer.noOfClusters = noOfClusters;
-    }
-
-    public static int getMaxIter() {
-        return maxIter;
     }
 
     public static void setMaxIter(int maxIter) {
@@ -116,86 +108,55 @@ public class Clusterer {
      * calculates the nearest center to each data point and adds the data to the cluster of respective center
      */
     private static void assignToCluster(ArrayList<Double> data) {
-        double[] difference;
-        double dataItem, cenVal, diff;
+       Object[] output ;
+       double value;
         for (int i = 0; i < data.size(); i++) {
-            difference = new double[noOfClusters];
-            dataItem = data.get(i);
-            for (int j = 0; j < noOfClusters; j++) {
-                cenVal = center.get(j);
-                diff = Math.abs(cenVal - dataItem);
-                diff = Math.round(diff * 10000.0) / 10000.0;
-                difference[j] = diff;
-            }
-            ArrayList<Integer> minList = getMinIndexA(difference);
-            if (minList.size() == 1) {
-                clusterGroup[minList.get(0)].add(dataItem);
-            } else {
-                int minIndex = minList.get(0);
-                for (int j = 1; j < minList.size(); j++) {
-                    if (center.get(minIndex) < center.get(minList.get(j))) {
-                        minIndex = minList.get(j);
-                    }
-                }
-                clusterGroup[minIndex].add(dataItem);
-            }
+            value = data.get(i);
+           output = getCenter(value);
+           int index = (Integer)output[1];
+           clusterGroup[index].add(value);
         }
     }
 
-    private static ArrayList<Integer> getMinIndexA(double[] diff) {
-        int minIndex = 0;
-        ArrayList<Integer> minList = new ArrayList<>();
-        for (int i = 1; i < diff.length; i++) {
-            if (diff[minIndex] > diff[i]) {
-                minIndex = i;
-            }
-        }
-        minList.add(minIndex);
-        for (int i = 0; i < diff.length; i++) {
-            if (diff[minIndex] == diff[i] && minIndex != i) {
-                //if (Math.abs(diff[minIndex] - diff[i]) < 0.0001 && minIndex != i) {
-                minList.add(i);
-            }
-        }
-        return minList;
-    }
+
+    /**
+     *
+     * @param value - the value for which the center it belongs to should be returned
+     * @return
+     */
 
     public static Object[] getCenter(double value) {
-        double[] difference;
-        double dataItem, cenVal, diff;
+
+        double centerValue, difference, currentDifference;
         int index;
-        difference = new double[noOfClusters];
-        dataItem = value;
-        for (int j = 0; j < noOfClusters; j++) {
-            cenVal = center.get(j);
-            diff = Math.abs(cenVal - dataItem);
-            diff = Math.round(diff * 10000.0) / 10000.0;
-            difference[j] = diff;
-        }
-        ArrayList<Integer> minList = getMinIndexA(difference);
-        if (minList.size() == 1) {
-            index = minList.get(0);
-            cenVal = center.get(index);
-            diff = Math.abs(cenVal - dataItem);
-            diff = Math.round(diff * 10000.0) / 10000.0;
-        } else {
-            int minIndex = minList.get(0);
-            for (int j = 1; j < minList.size(); j++) {
-                if (center.get(minIndex) < center.get(minList.get(j))) {
-                    minIndex = minList.get(j);
+
+        difference = Math.abs(center.get(0) - value);
+        difference = Math.round(difference * 10000.0) / 10000.0;
+        centerValue = center.get(0);
+        index = 0;
+        for (int j = 1; j < noOfClusters; j++) {
+            currentDifference =  Math.abs(center.get(j) - value);
+            currentDifference = Math.round(currentDifference * 10000.0) / 10000.0;
+            if(difference > currentDifference){
+                difference = currentDifference;
+                centerValue = center.get(j);
+                index = j;
+            }else if(currentDifference == difference){
+                if(centerValue < center.get(j)){
+                    centerValue = center.get(j);
+                    index = j;
                 }
             }
-            index = minIndex;
-            cenVal = center.get(index);
-            diff = Math.abs(cenVal - dataItem);
-            diff = Math.round(diff * 10000.0) / 10000.0;
-
         }
-        Object[] center = {cenVal, index, diff};
+
+        Object[] center = {centerValue, index, difference};
         return center;
     }
 
-
+    /**
+     * assign new arralists to hold the data for each cluster center
+     * during training
+     */
     public static void clearData() {
         for (int i = 0; i < clusterGroup.length; i++) {
             clusterGroup[i] = new ArrayList<Double>();
