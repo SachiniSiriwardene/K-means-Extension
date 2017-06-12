@@ -42,7 +42,6 @@ import java.util.Map;
         examples = @Example(description = "TBD", syntax = "TBD")
 )
 public class ClusteringStreamProcessor extends StreamProcessor {
-    private static Clusterer clusterer = new Clusterer();
     private int clusters;
     private int iterations;
     private boolean continueTraining;
@@ -62,16 +61,16 @@ public class ClusteringStreamProcessor extends StreamProcessor {
                 data.add(value);
                 Object[] outputData = null;
                 if (count > eventsToTrain) {
-                    outputData = clusterer.getCenter(value);
+                    outputData = Clusterer.getCenter(value);
                 }
                 if (continueTraining) {
                     if (count % eventsToTrain == 0) {
-                        clusterer.cluster(data);
+                        Clusterer.cluster(data);
                     }
                 } else {
                     if (count == eventsToTrain) {
-                        clusterer.cluster(data);
-                        clusterer.clearData();
+                        Clusterer.cluster(data);
+                        Clusterer.clearData();
                     }
                 }
                 if (outputData == null) {
@@ -119,9 +118,9 @@ public class ClusteringStreamProcessor extends StreamProcessor {
         Object clustersObject = attributeExpressionExecutors[1].execute(null);
         if (clustersObject instanceof Integer) {
             clusters = (Integer) clustersObject;
-            clusterer.setNoOfClusters(clusters);
+            Clusterer.setNoOfClusters(clusters);
             ArrayList<Double>[] clusterGroup = new ArrayList[clusters];
-            clusterer.setClusterGroup(clusterGroup);
+            Clusterer.setClusterGroup(clusterGroup);
         } else {
             throw new ExecutionPlanValidationException("Cluster centers should be of type int. But found "
                     + attributeExpressionExecutors[2].getReturnType());
@@ -131,7 +130,7 @@ public class ClusteringStreamProcessor extends StreamProcessor {
         Object iterationsObject = attributeExpressionExecutors[2].execute(null);
         if (iterationsObject instanceof Integer) {
             iterations = (Integer) iterationsObject;
-            clusterer.setMaxIter(iterations);
+            Clusterer.setMaxIter(iterations);
         } else {
             throw new ExecutionPlanValidationException("Iterations should be of type int. But found "
                     + attributeExpressionExecutors[2].getReturnType());
