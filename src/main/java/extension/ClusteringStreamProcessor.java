@@ -12,6 +12,7 @@ import org.wso2.siddhi.core.event.ComplexEventChunk;
 import org.wso2.siddhi.core.event.stream.StreamEvent;
 import org.wso2.siddhi.core.event.stream.StreamEventCloner;
 import org.wso2.siddhi.core.event.stream.populater.ComplexEventPopulater;
+import org.wso2.siddhi.core.executor.ConstantExpressionExecutor;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.Processor;
 import org.wso2.siddhi.core.query.processor.SchedulingProcessor;
@@ -108,22 +109,58 @@ public class ClusteringStreamProcessor extends StreamProcessor implements Schedu
 
         }
 
-        Object clustersObject = attributeExpressionExecutors[1].execute(null);
-        clusters = (Integer) clustersObject;
+        if (!(attributeExpressionExecutors[1] instanceof ConstantExpressionExecutor)) {
+            throw new ExecutionPlanValidationException("Cluster centers has to be a constant.");
+        }
+        if (!(attributeExpressionExecutors[2] instanceof ConstantExpressionExecutor)) {
+            throw new ExecutionPlanValidationException("Iterations centers has to be a constant.");
+        }
+        if (!(attributeExpressionExecutors[3] instanceof ConstantExpressionExecutor)) {
+            throw new ExecutionPlanValidationException("No. of events to train model has to be a constant.");
+        }
 
-        clusterer.setNoOfClusters(clusters);
-        ArrayList<Double>[] clusterGroup = new ArrayList[clusters];
-        clusterer.setClusterGroup(clusterGroup);
+
+
+        Object clustersObject = attributeExpressionExecutors[1].execute(null);
+        if (clustersObject instanceof Integer) {
+            clusters = (Integer) clustersObject;
+            clusterer.setNoOfClusters(clusters);
+            ArrayList<Double>[] clusterGroup = new ArrayList[clusters];
+            clusterer.setClusterGroup(clusterGroup);
+        }  else {
+            throw new ExecutionPlanValidationException("Cluster centers should be of type int. But found "
+                    + attributeExpressionExecutors[2].getReturnType());
+        }
+
 
         Object iterationsObject = attributeExpressionExecutors[2].execute(null);
-        iterations = (Integer) iterationsObject;
-        clusterer.setMaxIter(iterations);
+        if (iterationsObject instanceof Integer) {
+            iterations = (Integer) iterationsObject;
+            clusterer.setMaxIter(iterations);
+        }  else {
+            throw new ExecutionPlanValidationException("Iterations should be of type int. But found "
+                    + attributeExpressionExecutors[2].getReturnType());
+        }
+
+
 
         Object eventsToTrainObject = attributeExpressionExecutors[3].execute(null);
-        eventsToTrain = (Integer) eventsToTrainObject;
+        if (eventsToTrainObject instanceof Integer) {
+            eventsToTrain = (Integer) eventsToTrainObject;
+        }  else {
+            throw new ExecutionPlanValidationException("Events to train should be of type int. But found "
+                    + attributeExpressionExecutors[2].getReturnType());
+        }
+
 
         Object continueTrainObject = attributeExpressionExecutors[4].execute(null);
-        continueTraining = (Boolean) continueTrainObject;
+        if (continueTrainObject instanceof Boolean) {
+            continueTraining = (Boolean) continueTrainObject;
+        }  else {
+            throw new ExecutionPlanValidationException("Continue to train should be of type boolean. But found "
+                    + attributeExpressionExecutors[2].getReturnType());
+        }
+
 
         List<Attribute> attributeList = new ArrayList<Attribute>(3);
         attributeList.add(new Attribute("center", Attribute.Type.DOUBLE));
