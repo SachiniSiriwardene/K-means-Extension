@@ -8,8 +8,8 @@ public class Clusterer {
     private  int maximumIterations;
     private ArrayList<Double> center = new ArrayList<>();
     private ArrayList<Double> centerOld = new ArrayList<>();
-    private ArrayList<Double> distinctValues = new ArrayList<>();
-    private int distinctCount = 0;
+
+
     private ArrayList<ClusterObject> clusterData;
 
 
@@ -29,14 +29,12 @@ public class Clusterer {
         initialize(clusterData);
         int iter = 0;
         if (data.size() != 0) {
-            do {
-                if (!center.equals(centerOld)) {
-                    centerOld = new ArrayList<Double>();
-                }
+            while (!center.equals(centerOld) && iter < maximumIterations){
                 assignToCluster(data);
                 reinitializeCluster();
                 iter++;
-            } while (!center.equals(centerOld) && iter < maximumIterations);
+            }
+
 
         }
     }
@@ -45,16 +43,16 @@ public class Clusterer {
      * initializing cluster centers
      */
     public void initialize(ArrayList<ClusterObject> data) {
-        distinctCount = 0;
-        distinctValues.clear();
+       int distinctCount = 0;
+
         center.clear();
         for (int i = 0; i < data.size(); i++) {
             if (distinctCount >= numberOfClusters) {
                 break;
             }
             double value = data.get(i).getValue();
-            if (!distinctValues.contains(value)) {
-                distinctValues.add(value);
+            if (!center.contains(value)) {
+
                 center.add(value);
                 distinctCount++;
             }
@@ -71,11 +69,11 @@ public class Clusterer {
      */
     private void reinitializeCluster() {
         double[] average = average(clusterData);
+        centerOld = new ArrayList<>();
         for (int i = 0; i < numberOfClusters; i++) {
             centerOld.add(i, center.get(i));
             center.set(i, average[i]);
         }
-
     }
 
 

@@ -1,6 +1,8 @@
 package Kmeans;
 
-public class ClusterObject {
+import java.io.Serializable;
+
+public class ClusterObject implements Serializable {
 
     /**
      * Object which holds the data to be clustered and the
@@ -28,4 +30,19 @@ public class ClusterObject {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClusterObject that = (ClusterObject) o;
+
+        return Double.compare(that.value, value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        long temp = Double.doubleToLongBits(value);
+        return (int) (temp ^ (temp >>> 32));
+    }
 }

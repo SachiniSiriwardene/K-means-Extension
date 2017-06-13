@@ -41,26 +41,28 @@ public class ClusteringTestCase {
                // int count = 0;
                 for (Event event : inEvents) {
                     count++;
-                  //System.out.println(event);
+                 //System.out.println(event);
                     switch (count) {
                         case 1:
                             Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 2:
-                            Assert.assertEquals(3.06, event.getData(1));
+                            Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 3:
-                            Assert.assertEquals(3.01, event.getData(1));
+                            Assert.assertEquals(3.06, event.getData(1));
                             break;
                         case 4:
                             Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 5:
-                            Assert.assertEquals(3.08, event.getData(1));
+                            Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 6:
-                            Assert.assertEquals(3.045, event.getData(1));
+                            Assert.assertEquals(3.13, event.getData(1));
                             break;
+                        case 7:
+                            Assert.assertEquals(3.045,event.getData(1));
                         default:
                             break;
                     }
@@ -115,20 +117,22 @@ public class ClusteringTestCase {
                             Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 2:
-                            Assert.assertEquals(3.06, event.getData(1));
+                            Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 3:
-                            Assert.assertEquals(3.01, event.getData(1));
+                            Assert.assertEquals(3.06, event.getData(1));
                             break;
                         case 4:
                             Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 5:
-                            Assert.assertEquals(3.08, event.getData(1));
+                            Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 6:
-                            Assert.assertEquals(3.045, event.getData(1));
+                            Assert.assertEquals(3.13, event.getData(1));
                             break;
+                        case 7:
+                            Assert.assertEquals(3.045,event.getData(1));
                         default:
                             break;
                     }
@@ -193,19 +197,19 @@ public class ClusteringTestCase {
                             Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 2:
-                            Assert.assertEquals(3.06, event.getData(1));
+                            Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 3:
-                            Assert.assertEquals(3.01, event.getData(1));
+                            Assert.assertEquals(3.06, event.getData(1));
                             break;
                         case 4:
                             Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 5:
-                            Assert.assertEquals(3.08, event.getData(1));
+                            Assert.assertEquals(3.01, event.getData(1));
                             break;
                         case 6:
-                            Assert.assertEquals(3.045, event.getData(1));
+                            Assert.assertEquals(3.13, event.getData(1));
                             break;
                         default:
                             break;
@@ -271,21 +275,24 @@ public class ClusteringTestCase {
                 for (Event event : inEvents) {
                     // countDownLatch.countDown();
                     count++;
-                   //System.out.println(event);
+                  // System.out.println(event);
                     switch (count) {
                         case 1:
-                            Assert.assertEquals(3.05, event.getData(1));
+                            Assert.assertEquals(3.13, event.getData(1));
                             break;
                         case 2:
                             Assert.assertEquals(3.05, event.getData(1));
                             break;
                         case 3:
-                            Assert.assertEquals(2.97, event.getData(1));
+                            Assert.assertEquals(3.05, event.getData(1));
                             break;
                         case 4:
                             Assert.assertEquals(2.97, event.getData(1));
                             break;
                         case 5:
+                            Assert.assertEquals(2.97, event.getData(1));
+                            break;
+                        case 6:
                             Assert.assertEquals(3.13, event.getData(1));
                             break;
                         default:
