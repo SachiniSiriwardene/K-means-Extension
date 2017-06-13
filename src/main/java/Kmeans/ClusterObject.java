@@ -1,10 +1,12 @@
 package Kmeans;
 
-/**
- * Created by sachini on 6/12/17.
- */
 public class ClusterObject {
-    private double centroid;
+
+    /**
+     * Object which holds the data to be clustered and the
+     * index of the centroid to which it belongs to
+     */
+
     private double value;
     private int index;
 
@@ -16,14 +18,6 @@ public class ClusterObject {
     public void setIndex(int index) {
         this.index = index;
     }
-
-/*    public double getCentroid() {
-        return centroid;
-    }
-
-    public void setCentroid(double centroid) {
-        this.centroid = centroid;
-    }*/
 
     public double getValue() {
         return value;
