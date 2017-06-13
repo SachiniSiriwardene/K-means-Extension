@@ -28,8 +28,8 @@ public class ClusteringTestCase {
         String inputStream = "define stream InputStream (value double, timestamp long);";
 
         String executionPlan = ("@info(name = 'query1') "
-                  + "from InputStream#window.length(5)#kmeans:cluster(value, 4, 20, 5, true) "
-                  + "select value, center, centerIndex, centerDistance "
+                  + "from InputStream#window.length(5)#kmeans:cluster(value, 4, 20, 5) "
+                  + "select value, matchedClusterCentroid, matchedClusterIndex, distanceToCenter "
                   + "insert into OutputStream;");
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager
                 .createExecutionPlanRuntime(inputStream + executionPlan);
@@ -41,7 +41,7 @@ public class ClusteringTestCase {
                // int count = 0;
                 for (Event event : inEvents) {
                     count++;
-                 // System.out.println(event);
+                  //  System.out.println(event);
                     switch (count) {
                         case 1:
                             Assert.assertEquals(3.01, event.getData(1));
@@ -95,8 +95,8 @@ public class ClusteringTestCase {
         String inputStream = "define stream InputStream (value double, timestamp long);";
 
         String executionPlan = ("@info(name = 'query1') "
-                + "from InputStream#window.time(5 sec)#kmeans:cluster(value, 4, 20, 5, true) "
-                + "select value, center, centerIndex, centerDistance "
+                + "from InputStream#window.time(5 sec)#kmeans:cluster(value, 4, 20, 5) "
+                + "select value, matchedClusterCentroid, matchedClusterIndex, distanceToCenter "
                 + "insert into OutputStream;");
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager
                 .createExecutionPlanRuntime(inputStream + executionPlan);
@@ -109,7 +109,7 @@ public class ClusteringTestCase {
                 for (Event event : inEvents) {
                     // countDownLatch.countDown();
                     count++;
-                    //  System.out.println(event);
+                    //System.out.println(event);
                     switch (count) {
                         case 1:
                             Assert.assertEquals(3.01, event.getData(1));
@@ -173,8 +173,8 @@ public class ClusteringTestCase {
         String inputStream = "define stream InputStream (value double, timestamp long);";
 
         String executionPlan = ("@info(name = 'query1') "
-                + "from InputStream#window.timeBatch(5 sec)#kmeans:cluster(value, 4, 20, 5, true) "
-                + "select value, center, centerIndex, centerDistance "
+                + "from InputStream#window.timeBatch(5 sec)#kmeans:cluster(value, 4, 20, 5) "
+                + "select value, matchedClusterCentroid, matchedClusterIndex, distanceToCenter "
                 + "insert into OutputStream;");
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager
                 .createExecutionPlanRuntime(inputStream + executionPlan);
@@ -187,7 +187,7 @@ public class ClusteringTestCase {
                 for (Event event : inEvents) {
                     // countDownLatch.countDown();
                     count++;
-                    //  System.out.println(event);
+                  //  System.out.println(event);
                     switch (count) {
                         case 1:
                             Assert.assertEquals(3.01, event.getData(1));
@@ -239,6 +239,14 @@ public class ClusteringTestCase {
         Thread.sleep(1000);
         inputHandler.send(new Object[]{3.08});//11
         Thread.sleep(1000);
+        inputHandler.send(new Object[]{2.92});//12
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{2.99});//13
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{3.13});//14
+        Thread.sleep(1000);
+        inputHandler.send(new Object[]{3.08});//15
+        Thread.sleep(1000);
     }
 
 
@@ -246,11 +254,11 @@ public class ClusteringTestCase {
     @Test
     public void clusteringDiscontinueTrainingTestcase() throws Exception{
         SiddhiManager siddhiManager = new SiddhiManager();
-        String inputStream = "define stream InputStream (value double, timestamp long);";
+        String inputStream = "define stream InputStream (value double, train bool);";
 
         String executionPlan = ("@info(name = 'query1') "
-                + "from InputStream#window.length(10)#kmeans:cluster(value, 4, 20, 10, false) "
-                + "select value, center, centerIndex, centerDistance "
+                + "from InputStream#window.length(10)#kmeans:cluster(value, 4, 20, train) "
+                + "select value, matchedClusterCentroid, matchedClusterIndex, distanceToCenter "
                 + "insert into OutputStream;");
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager
                 .createExecutionPlanRuntime(inputStream + executionPlan);
@@ -263,6 +271,7 @@ public class ClusteringTestCase {
                 for (Event event : inEvents) {
                     // countDownLatch.countDown();
                     count++;
+                   //System.out.println(event);
                     switch (count) {
                         case 1:
                             Assert.assertEquals(3.05, event.getData(1));
@@ -289,21 +298,21 @@ public class ClusteringTestCase {
 
         InputHandler inputHandler = executionPlanRuntime.getInputHandler("InputStream");
         executionPlanRuntime.start();
-        inputHandler.send(new Object[]{3.08});//1
-        inputHandler.send(new Object[]{3.02});//2
-        inputHandler.send(new Object[]{3.22});//3
-        inputHandler.send(new Object[]{3.06});//4
-        inputHandler.send(new Object[]{3.0});//5
-        inputHandler.send(new Object[]{3.03});//6
-        inputHandler.send(new Object[]{3.06});//7
-        inputHandler.send(new Object[]{2.92});//8
-        inputHandler.send(new Object[]{2.99});//9
-        inputHandler.send(new Object[]{3.13});//10
-        inputHandler.send(new Object[]{3.08});//11
-        inputHandler.send(new Object[]{3.06});//12
-        inputHandler.send(new Object[]{2.92});//13
-        inputHandler.send(new Object[]{2.99});//14
-        inputHandler.send(new Object[]{3.13});//15
+        inputHandler.send(new Object[]{3.08,false});//1
+        inputHandler.send(new Object[]{3.02,false});//2
+        inputHandler.send(new Object[]{3.22,false});//3
+        inputHandler.send(new Object[]{3.06,false});//4
+        inputHandler.send(new Object[]{3.0, false});//5
+        inputHandler.send(new Object[]{3.03,false});//6
+        inputHandler.send(new Object[]{3.06,false});//7
+        inputHandler.send(new Object[]{2.92,false});//8
+        inputHandler.send(new Object[]{2.99,false});//9
+        inputHandler.send(new Object[]{3.13,true});//10
+        inputHandler.send(new Object[]{3.08,false});//11
+        inputHandler.send(new Object[]{3.06,false});//12
+        inputHandler.send(new Object[]{2.92,false});//13
+        inputHandler.send(new Object[]{2.99,false});//14
+        inputHandler.send(new Object[]{3.13,false});//15
     }
 
 

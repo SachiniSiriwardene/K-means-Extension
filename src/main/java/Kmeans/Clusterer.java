@@ -4,163 +4,153 @@ import java.util.ArrayList;
 
 
 public class Clusterer {
-    private static int noOfClusters;
-    private static int maxIter;
-    private static ArrayList<Double>[] clusterGroup;
-    private static ArrayList<Double> center = new ArrayList<>();
-    private static ArrayList<Double> centerOld = new ArrayList<>();
-    private static ArrayList<Double> distinctValues = new ArrayList<>();
-    private static int distinctCount = 0;
+    private  int numberOfClusters;
+    private  int maximumIterations;
+    private ArrayList<Double> center = new ArrayList<>();
+    private ArrayList<Double> centerOld = new ArrayList<>();
+    private ArrayList<Double> distinctValues = new ArrayList<>();
+    private int distinctCount = 0;
+    private ArrayList<ClusterObject> clusterData;
 
-    public static void setNoOfClusters(int noOfClusters) {
-        Clusterer.noOfClusters = noOfClusters;
-    }
 
-    public static void setMaxIter(int maxIter) {
-        Clusterer.maxIter = maxIter;
-    }
-
-    public static void setClusterGroup(ArrayList<Double>[] clusterGroup) {
-        Clusterer.clusterGroup = clusterGroup;
+    /**
+     * Initialize no. of cluster centers, no. of iterations, clusterGroup array
+     */
+    public Clusterer(int clusters, int iterations) {
+        numberOfClusters = clusters;
+        maximumIterations = iterations;
     }
 
     /**
      * Perform clustering
      */
-    public static void cluster(ArrayList<Double> data) {
-        clearData();
-        initialize(data);
+    public void cluster(ArrayList<ClusterObject> data) {
+        clusterData = data;
+        initialize(clusterData);
         int iter = 0;
         if (data.size() != 0) {
             do {
                 if (!center.equals(centerOld)) {
                     centerOld = new ArrayList<Double>();
-                    for (int i = 0; i < clusterGroup.length; i++) {
-                        clusterGroup[i] = new ArrayList<>();
-
-                    }
                 }
                 assignToCluster(data);
                 reinitializeCluster();
                 iter++;
-            } while (!center.equals(centerOld) && iter < maxIter);
+            } while (!center.equals(centerOld) && iter < maximumIterations);
+
         }
     }
 
     /**
      * initializing cluster centers
      */
-    public static void initialize(ArrayList<Double> data) {
+    public void initialize(ArrayList<ClusterObject> data) {
         distinctCount = 0;
         distinctValues.clear();
         center.clear();
         for (int i = 0; i < data.size(); i++) {
-            if (distinctCount >= noOfClusters) {
+            if (distinctCount >= numberOfClusters) {
                 break;
             }
-            double value = data.get(i);
+            double value = data.get(i).getValue();
             if (!distinctValues.contains(value)) {
                 distinctValues.add(value);
                 center.add(value);
-                clusterGroup[distinctCount] = new ArrayList<>();
                 distinctCount++;
 
             }
         }
-        if (distinctCount < noOfClusters) {
-            noOfClusters = distinctCount;
+        if (distinctCount < numberOfClusters) {
+            numberOfClusters = distinctCount;
         }
+
     }
 
 
     /**
      * reinitialize the cluster centres and store the old ones
      */
-    private static void reinitializeCluster() {
-        for (int i = 0; i < noOfClusters; i++) {
+    private void reinitializeCluster() {
+        double[] average = average(clusterData);
+        for (int i = 0; i < numberOfClusters; i++) {
             centerOld.add(i, center.get(i));
-            if (!clusterGroup[i].isEmpty()) {
-                center.set(i, average(clusterGroup[i]));
-            }
+            center.set(i, average[i]);
         }
-
 
     }
 
 
     /**
      * base on the data points assigned to the cluster, recalculates the cluster center
-     *
-     * @param doubles the cluster
+     * @param clusterData arraylist containing clusterObjects to be clustered
      * @return the new cluster center
      */
-    private static Double average(ArrayList<Double> doubles) {
-        double sum = 0;
-        for (int i = 0; i < doubles.size(); i++) {
-            sum = sum + doubles.get(i);
-
+    private double[] average(ArrayList<ClusterObject> clusterData) {
+        double[] total = new double[numberOfClusters];
+        int[] count = new int[numberOfClusters];
+        for (int i = 0; i < numberOfClusters; i++) {
+            total[i] = 0;
+            count[i] = 0;
         }
-
-        return (sum / doubles.size());
+        for (int i = 0; i < clusterData.size(); i++) {
+            int centerIndex = clusterData.get(i).getIndex();
+            count[centerIndex] += 1;
+            total[centerIndex] += clusterData.get(i).getValue();
+        }
+        for (int i = 0; i < numberOfClusters; i++) {
+            total[i] = total[i] / count[i];
+        }
+        return (total);
     }
 
     /**
      * calculates the nearest center to each data point and adds the data to the cluster of respective center
+     * @param data - arraylist containing clusterObjects to be assigned to new clusters
      */
-    private static void assignToCluster(ArrayList<Double> data) {
-       Object[] output ;
-       double value;
+    private void assignToCluster(ArrayList<ClusterObject> data) {
+        Object[] output;
+        double value;
         for (int i = 0; i < data.size(); i++) {
-            value = data.get(i);
-           output = getCenter(value);
-           int index = (Integer)output[1];
-           clusterGroup[index].add(value);
+            value = data.get(i).getValue();
+            output = getCenter(value);
+            double center = (Double) output[0];
+            int index = (Integer) output[1];
+            data.get(i).setCentroid(center);
+            data.get(i).setIndex(index);
         }
     }
 
 
     /**
-     *
      * @param value - the value for which the center it belongs to should be returned
-     * @return
+     * @return center - object array containing the matched cluster center, the index of the cluster center,
+     *                  and the distance to the cluster center
      */
 
-    public static Object[] getCenter(double value) {
-
+    public Object[] getCenter(double value) {
         double centerValue, difference, currentDifference;
         int index;
-
         difference = Math.abs(center.get(0) - value);
         difference = Math.round(difference * 10000.0) / 10000.0;
         centerValue = center.get(0);
         index = 0;
-        for (int j = 1; j < noOfClusters; j++) {
-            currentDifference =  Math.abs(center.get(j) - value);
+        for (int j = 1; j < numberOfClusters; j++) {
+            currentDifference = Math.abs(center.get(j) - value);
             currentDifference = Math.round(currentDifference * 10000.0) / 10000.0;
-            if(difference > currentDifference){
+            if (difference > currentDifference) {
                 difference = currentDifference;
                 centerValue = center.get(j);
                 index = j;
-            }else if(currentDifference == difference){
-                if(centerValue < center.get(j)){
+            } else if (currentDifference == difference) {
+                if (centerValue < center.get(j)) {
                     centerValue = center.get(j);
                     index = j;
                 }
             }
         }
-
         Object[] center = {centerValue, index, difference};
         return center;
     }
 
-    /**
-     * assign new arralists to hold the data for each cluster center
-     * during training
-     */
-    public static void clearData() {
-        for (int i = 0; i < clusterGroup.length; i++) {
-            clusterGroup[i] = new ArrayList<Double>();
 
-        }
-    }
 }
