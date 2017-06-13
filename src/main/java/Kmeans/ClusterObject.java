@@ -17,13 +17,13 @@ public class ClusterObject {
         this.index = index;
     }
 
-    public double getCentroid() {
+/*    public double getCentroid() {
         return centroid;
     }
 
     public void setCentroid(double centroid) {
         this.centroid = centroid;
-    }
+    }*/
 
     public double getValue() {
         return value;

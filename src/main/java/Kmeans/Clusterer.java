@@ -57,7 +57,6 @@ public class Clusterer {
                 distinctValues.add(value);
                 center.add(value);
                 distinctCount++;
-
             }
         }
         if (distinctCount < numberOfClusters) {
@@ -113,9 +112,7 @@ public class Clusterer {
         for (int i = 0; i < data.size(); i++) {
             value = data.get(i).getValue();
             output = getCenter(value);
-            double center = (Double) output[0];
             int index = (Integer) output[1];
-            data.get(i).setCentroid(center);
             data.get(i).setIndex(index);
         }
     }

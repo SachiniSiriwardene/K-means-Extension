@@ -41,7 +41,7 @@ public class ClusteringTestCase {
                // int count = 0;
                 for (Event event : inEvents) {
                     count++;
-                  //  System.out.println(event);
+                  //System.out.println(event);
                     switch (count) {
                         case 1:
                             Assert.assertEquals(3.01, event.getData(1));

@@ -67,8 +67,8 @@ import java.util.Map;
                 )
         },
         examples = @Example(syntax = "\"from InputStream#window.length(5)#kmeans:cluster(value, 4, 20, 5) \"\n" +
-                "\n select value, matchedClusterCentroid, matchedClusterIndex, distanceToCenter \"\n" +
-                "\n insert into OutputStream;",
+                " select value, matchedClusterCentroid, matchedClusterIndex, distanceToCenter \"\n" +
+                " insert into OutputStream;",
                 description = "This will cluster the collected values within the window for every 5 events" +
                         "and give the output after the first 5 events.")
 )
